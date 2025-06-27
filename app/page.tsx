@@ -74,15 +74,25 @@ export default function MoneyMakerLanding() {
 
       <div className="relative z-10 flex-1 max-w-2xl mb-16 pl-16">
         {/* Logo */}
-        <div className="mb-12">
-          <div className="flex items-center gap-2 mb-2">
-            <Image src="/image.png" alt="Logo" width={250} height={250} />
-          </div>
+        <div className="mb-8 flex justify-center md:justify-start">
+          <Image
+            src="/image.png"
+            alt="Logo"
+            width={250}
+            height={250}
+            className="w-24 h-auto md:w-40"
+          />
         </div>
 
         {/* Main Heading */}
-        <h1 className="text-4xl lg:text-6xl font-black mb-12 leading-none">
-          <Image src="/images/entre.png" alt="Logo" width={750} height={250} />
+        <h1 className="text-2xl md:text-4xl lg:text-6xl font-black mb-8 leading-none flex justify-center md:justify-start">
+          <Image
+            src="/images/entre.png"
+            alt="Logo"
+            width={750}
+            height={250}
+            className="w-60 md:w-[500px] h-auto"
+          />
         </h1>
 
         {/* Enhanced CTA Button */}
@@ -93,7 +103,7 @@ export default function MoneyMakerLanding() {
             size="lg"
             disabled={loading}
             onClick={handleClick}
-            className="relative px-20 py-10 text-4xl font-black rounded-full bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-600 shadow-2xl text-black transition-all duration-300 hover:scale-110 hover:from-yellow-200 hover:to-amber-700 focus:outline-none focus:ring-4 focus:ring-yellow-400 border-4 border-yellow-200/50 hover:border-yellow-100"
+            className="relative px-8 py-4 text-lg md:px-20 md:py-10 md:text-4xl font-black rounded-full bg-gradient-to-r from-yellow-300 via-amber-400 to-yellow-600 shadow-2xl text-black transition-all duration-300 hover:scale-110 hover:from-yellow-200 hover:to-amber-700 focus:outline-none focus:ring-4 focus:ring-yellow-400 border-4 border-yellow-200/50 hover:border-yellow-100"
             style={{
               boxShadow: `
                 0 0 30px rgba(251, 191, 36, 0.8),

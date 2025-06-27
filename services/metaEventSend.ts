@@ -37,11 +37,7 @@ export async function sendMetaEvent(email: string, value: string = "10"): Promis
     const accessToken = process.env.NEXT_PUBLIC_META_ACCESS_TOKEN;
     const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
     const endpoint = process.env.NEXT_PUBLIC_API_ENDPOINT;
-    
-    console.log('🔧 Variables de entorno:');
-    console.log('  - Endpoint:', endpoint ? '✅ Configurado' : '❌ No configurado');
-    console.log('  - Access Token:', accessToken ? '✅ Configurado' : '❌ No configurado');
-    console.log('  - Pixel ID:', pixelId ? '✅ Configurado' : '❌ No configurado');
+  
     
     if (!endpoint) {
       throw new Error('Endpoint no configurado');

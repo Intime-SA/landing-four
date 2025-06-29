@@ -4,7 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import type { Metadata } from 'next'
 import { Bebas_Neue, Montserrat } from 'next/font/google'
 import Script from 'next/script'
-
+import { TrackingProvider } from "./context/traking-context"
 // Configurar Montserrat
 const montserrat = Bebas_Neue({
   subsets: ['latin'],
@@ -136,7 +136,9 @@ export default function RootLayout({
           />
         </noscript>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          {children}
+          <TrackingProvider>
+            {children}
+          </TrackingProvider>
         </ThemeProvider>
       </body>
     </html>

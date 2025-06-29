@@ -4,10 +4,11 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import React, { useState } from "react"
 import { sendMetaEvent } from "../services/metaEventSend"
+import { useUserTracking } from "./context/traking-context"
 
 export default function MoneyMakerLanding() {
   const [loading, setLoading] = useState(false)
-
+  const { sendTrackingData } = useUserTracking();
   const handleClick = async () => {
     try {
       setLoading(true)
@@ -22,6 +23,13 @@ export default function MoneyMakerLanding() {
         console.log('Evento de registro enviado exitosamente a Meta');
       } else {
         console.warn('No se pudo enviar el evento a Meta');
+      }
+
+      try {
+        await sendTrackingData();
+        console.log('Datos de tracking enviados exitosamente');
+      } catch (error) {
+        console.warn('Error enviando datos de tracking:', error);
       }
       
       // Simular loading por 2 segundos

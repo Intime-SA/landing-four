@@ -1,9 +1,12 @@
-"use client"
+'use client'
 
 import React, { createContext, useContext, useState, useEffect, useRef, type ReactNode } from 'react'
 import axios from 'axios'
 
 export interface UserTrackingData {
+  // UID único de la visita
+  visitUid: string
+  
   // Información del navegador
   userAgent: string
   language: string
@@ -62,13 +65,16 @@ export interface TrackingEvent {
   type: 'page_view' | 'click' | 'scroll' | 'focus' | 'blur' | 'session_end'
   data: Partial<UserTrackingData>
   timestamp: number
+  visitUid: string
 }
 
 interface TrackingContextType {
   trackingData: UserTrackingData | null
   sendTrackingData: () => Promise<any>
+  sendInitTracking: () => Promise<any>
   incrementPageViews: () => void
   getSessionId: () => string
+  getVisitUid: () => string
   getEvents: () => TrackingEvent[]
 }
 
@@ -84,6 +90,7 @@ export const TrackingProvider: React.FC<{ children: ReactNode }> = ({ children }
   const lastActivityTime = useRef<number>(Date.now())
   const isActive = useRef<boolean>(true)
   const sessionId = useRef<string>(`${Date.now()}-${Math.random().toString(36).substr(2, 9)}`)
+  const visitUid = useRef<string>(`visit_${Date.now()}_${Math.random().toString(36).substr(2, 15)}`)
   const mouseMovementCount = useRef<number>(0)
   const clickCount = useRef<number>(0)
   const scrollDepth = useRef<number>(0)
@@ -91,6 +98,7 @@ export const TrackingProvider: React.FC<{ children: ReactNode }> = ({ children }
   const isSending = useRef<boolean>(false)
   const isInitialized = useRef<boolean>(false) // Evitar múltiples inicializaciones
   const hasSentBeforeUnload = useRef<boolean>(false) // Evitar envíos duplicados en beforeunload
+  const hasSentInitTracking = useRef<boolean>(false) // Evitar envíos duplicados de init tracking
 
   // Función para obtener IP
   const getIPAddress = async (): Promise<string | undefined> => {
@@ -138,6 +146,9 @@ export const TrackingProvider: React.FC<{ children: ReactNode }> = ({ children }
     const ipAddress = await getIPAddress()
     
     return {
+      // UID único de la visita
+      visitUid: visitUid.current,
+      
       // Información del navegador
       userAgent: navigator.userAgent,
       language: navigator.language,
@@ -264,12 +275,86 @@ export const TrackingProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
   }
 
+  // Función para enviar init tracking
+  const sendInitTracking = async () => {
+    // Evitar envíos duplicados
+    if (hasSentInitTracking.current) {
+      console.log('Init tracking ya fue enviado, saltando...')
+      return
+    }
+
+    try {
+      hasSentInitTracking.current = true
+      
+      const endpoint = process.env.NEXT_PUBLIC_API_ENDPOINT
+      const accessToken = process.env.NEXT_PUBLIC_META_ACCESS_TOKEN
+      const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID
+      
+      if (!endpoint) {
+        throw new Error('Endpoint no configurado')
+      }
+
+      const payload = {
+        visitUid: visitUid.current,
+        sessionId: sessionId.current,
+        page_id: pixelId || null,
+        timestamp: Date.now(),
+        access_token: accessToken || null,
+        pixel_id: pixelId || null
+      }
+
+      const response = await axios.post(`${endpoint}/init-tracking`, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        timeout: 10000
+      })
+
+      console.log('Init tracking enviado exitosamente:', response.data)
+      return response.data
+    } catch (error) {
+      console.error('Error enviando init tracking:', error)
+      // Fallback: guardar en localStorage
+      saveInitToLocalStorage()
+      throw error
+    }
+  }
+
+  // Función para guardar init tracking en localStorage como fallback
+  const saveInitToLocalStorage = () => {
+    try {
+const accessToken = process.env.NEXT_PUBLIC_META_ACCESS_TOKEN
+      const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID
+      
+      const initData = {
+        visitUid: visitUid.current,
+        sessionId: sessionId.current,
+        page_id: pixelId || null,
+        timestamp: Date.now(),
+        access_token: accessToken || null,
+        pixel_id: pixelId || null
+      }
+      
+      const existingData = localStorage.getItem('initTrackingData')
+      const data = existingData ? JSON.parse(existingData) : []
+      data.push({
+        ...initData,
+        created_at: new Date().toISOString()
+      })
+      localStorage.setItem('initTrackingData', JSON.stringify(data))
+      console.log('Init tracking guardado en localStorage como fallback')
+    } catch (error) {
+      console.error('Error guardando init tracking en localStorage:', error)
+    }
+  }
+
   // Función para agregar evento
   const addEvent = (type: TrackingEvent['type'], data: Partial<UserTrackingData> = {}) => {
     const event: TrackingEvent = {
       type,
       data,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      visitUid: visitUid.current
     }
     setEvents(prev => [...prev, event])
   }
@@ -282,6 +367,11 @@ export const TrackingProvider: React.FC<{ children: ReactNode }> = ({ children }
   // Función para obtener session ID
   const getSessionId = () => {
     return sessionId.current
+  }
+
+  // Función para obtener visit UID
+  const getVisitUid = () => {
+    return visitUid.current
   }
 
   // Función para obtener eventos
@@ -320,6 +410,11 @@ export const TrackingProvider: React.FC<{ children: ReactNode }> = ({ children }
     isInitialized.current = true
 
     console.log('Inicializando Tracking Provider...')
+
+    // Enviar init tracking inmediatamente cuando el usuario entra
+    sendInitTracking().catch(error => {
+      console.error('Error en init tracking:', error)
+    })
 
     // Obtener datos iniciales
     getTrackingData().then(setTrackingData)
@@ -432,8 +527,10 @@ export const TrackingProvider: React.FC<{ children: ReactNode }> = ({ children }
   const value: TrackingContextType = {
     trackingData,
     sendTrackingData,
+    sendInitTracking,
     incrementPageViews,
     getSessionId,
+    getVisitUid,
     getEvents
   }
 

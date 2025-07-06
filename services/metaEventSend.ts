@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 interface MetaEventData {
+  event_id: string;
   event_name: string;
   event_time: number;
   action_source: string;
@@ -13,7 +14,7 @@ interface MetaEventData {
   };
 }
 
-export async function sendMetaEvent(email: string, value: string = "10"): Promise<boolean> {
+export async function sendMetaEvent(email: string, value: string = "10", event_id: string = "1234567890"): Promise<boolean> {
   console.log('🚀 Iniciando envío de evento a Meta...');
   console.log('📧 Email:', email);
   console.log('💰 Valor:', value);
@@ -21,6 +22,7 @@ export async function sendMetaEvent(email: string, value: string = "10"): Promis
   try {
     const eventData: MetaEventData = {
       event_name: "Purchase",
+      event_id: event_id,
       event_time: Math.floor(Date.now() / 1000),
       action_source: "website",
       user_data: {

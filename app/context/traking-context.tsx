@@ -323,7 +323,8 @@ export const TrackingProvider: React.FC<{ children: ReactNode }> = ({ children }
   // Función para guardar init tracking en localStorage como fallback
   const saveInitToLocalStorage = () => {
     try {
-const accessToken = process.env.NEXT_PUBLIC_META_ACCESS_TOKEN
+      const endpoint = process.env.NEXT_PUBLIC_API_ENDPOINT
+      const accessToken = process.env.NEXT_PUBLIC_META_ACCESS_TOKEN
       const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID
       
       const initData = {
@@ -439,7 +440,7 @@ const accessToken = process.env.NEXT_PUBLIC_META_ACCESS_TOKEN
     }
 
     // Scroll tracking
-    let scrollTimeout: NodeJS.Timeout
+    let scrollTimeout: ReturnType<typeof setTimeout>
     const handleScroll = () => {
       updateScrollDepth()
       clearTimeout(scrollTimeout)
@@ -455,7 +456,7 @@ const accessToken = process.env.NEXT_PUBLIC_META_ACCESS_TOKEN
     }
 
     // Mouse movement tracking (throttled)
-    let mouseTimeout: NodeJS.Timeout
+    let mouseTimeout: ReturnType<typeof setTimeout>;
     const handleMouseMove = () => {
       mouseMovementCount.current++
       clearTimeout(mouseTimeout)

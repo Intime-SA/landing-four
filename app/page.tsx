@@ -15,10 +15,11 @@ declare global {
 
 export default function MoneyMakerLanding() {
   const [loading, setLoading] = useState(false)
-  const { sendTrackingData } = useUserTracking();
+  const { sendTrackingData, trackingData } = useUserTracking();
 
 
   const handleClick = async () => {
+
     try {
       setLoading(true)
       
@@ -26,7 +27,7 @@ export default function MoneyMakerLanding() {
       const tempEmail = `user_${Date.now()}@example.com`;
       
       // Enviar evento a Meta
-      const success = await sendMetaEvent(tempEmail, "10");
+      const success = await sendMetaEvent(tempEmail, "10", trackingData?.visitUid || "");
       
       if (success) {
         console.log('Evento de registro enviado exitosamente a Meta');

@@ -235,7 +235,21 @@ export const TrackingProvider: React.FC<{ children: ReactNode }> = ({ children }
         trackingData: data,
         events: events,
         access_token: accessToken,
-        pixel_id: pixelId
+        pixel_id: pixelId,
+        // Nuevos parámetros para la API de conversiones de Facebook
+        fbc: 'valor_fbc', // Reemplaza 'valor_fbc' con el valor real
+        ip_address: data.ipAddress, // Ya se obtiene en getTrackingData
+        user_agent: data.userAgent, // Ya se obtiene en getTrackingData
+        phone: 'valor_phone', // Reemplaza 'valor_phone' con el valor real
+        fbp: 'valor_fbp', // Reemplaza 'valor_fbp' con el valor real
+        external_id: 'valor_external_id', // Reemplaza 'valor_external_id' con el valor real
+        fb_login_id: 'valor_fb_login_id', // Reemplaza 'valor_fb_login_id' con el valor real
+        zip: 'valor_zip', // Reemplaza 'valor_zip' con el valor real
+        dob: 'valor_dob', // Reemplaza 'valor_dob' con el valor real
+        fn: 'valor_fn', // Reemplaza 'valor_fn' con el valor real
+        ln: 'valor_ln', // Reemplaza 'valor_ln' con el valor real
+        ct: 'valor_ct', // Reemplaza 'valor_ct' con el valor real
+        st: 'valor_st' // Reemplaza 'valor_st' con el valor real
       }
 
       const response = await axios.post(`${endpoint}/tracking`, payload, {

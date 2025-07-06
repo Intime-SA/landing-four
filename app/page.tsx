@@ -6,9 +6,18 @@ import React, { useState } from "react"
 import { sendMetaEvent } from "../services/metaEventSend"
 import { useUserTracking } from "./context/traking-context"
 
+// Extender la interfaz Window para incluir fbq
+declare global {
+  interface Window {
+    fbq: (...args: any[]) => void;
+  }
+}
+
 export default function MoneyMakerLanding() {
   const [loading, setLoading] = useState(false)
   const { sendTrackingData } = useUserTracking();
+
+
   const handleClick = async () => {
     try {
       setLoading(true)
@@ -23,6 +32,18 @@ export default function MoneyMakerLanding() {
         console.log('Evento de registro enviado exitosamente a Meta');
       } else {
         console.warn('No se pudo enviar el evento a Meta');
+      }
+
+      // Enviar evento de compra a Facebook
+      if (typeof window.fbq === 'function') {
+        window.fbq('track', 'Purchase', {
+          content_name: 'Botón CTA',
+          value: 0,
+          currency: 'USD',
+        });
+        console.log('Evento de compra enviado a Facebook');
+      } else {
+        console.warn('No se pudo enviar el evento de compra a Facebook');
       }
 
       try {
@@ -108,6 +129,7 @@ export default function MoneyMakerLanding() {
           {/* Glow Effect Background */}
           
           <Button
+          id='cta-button'
             size="lg"
             disabled={loading}
             onClick={handleClick}

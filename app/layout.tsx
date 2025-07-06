@@ -127,6 +127,31 @@ export default function RootLayout({
             `,
           }}
         />
+        <Script
+          id="cta-button-script"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              document.addEventListener('DOMContentLoaded', function() {
+                const button = document.getElementById("cta-button");
+                if (button) {
+                  console.log("Botón CTA encontrado por script en index.html");
+                  button.addEventListener("click", function () {
+                    if (typeof window.fbq === 'function') {
+                      window.fbq("track", "Lead", {
+                        content_name: "Botón CTA (via index.html)",
+                        value: 0,
+                        currency: "USD",
+                      });
+                    }
+                  });
+                } else {
+                  console.log("No se encontró el botón CTA por script en index.html después de DOMContentLoaded");
+                }
+              });
+            `,
+          }}
+        />
         <noscript>
           <img
             height="1"
